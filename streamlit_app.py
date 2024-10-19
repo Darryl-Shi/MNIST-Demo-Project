@@ -31,7 +31,7 @@ class Net(nn.Module):
         return x
 
 # Load the trained model
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_model():
     model = Net()
     model.load_state_dict(torch.load('mnist_cnn.pth', map_location=torch.device('cpu')))
