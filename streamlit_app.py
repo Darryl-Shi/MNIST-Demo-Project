@@ -8,7 +8,27 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
-from train_model import Net
+
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        # Convolutional layers
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=5)  # Output: (batch, 32, 24, 24)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5)  # Output: (batch, 64, 20, 20)
+        # Fully connected layers
+        self.fc1 = nn.Linear(64 * 4 * 4, 128)  # Adjusted input size after pooling
+        self.fc2 = nn.Linear(128, 10)
+
+    def forward(self, x):
+        # Convolutional layers with ReLU and MaxPool
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))  # Output: (batch, 32, 12, 12)
+        x = F.relu(F.max_pool2d(self.conv2(x), 2))  # Output: (batch, 64, 4, 4)
+        # Flatten
+        x = x.view(-1, 64 * 4 * 4)
+        # Fully connected layers with ReLU
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
 # Load the trained model
 @st.cache(allow_output_mutation=True)
